@@ -89,7 +89,7 @@ class UltimateTTT(ModeloJuegoZT2):
         for tablero in tableros:
             if self.victoria(tablero) == 0 and any(cell == 0 for cell in tablero):
                 return False
-            
+
         return True
     
     def ganancia(self, s):
@@ -250,6 +250,24 @@ def simple_evalua_uttt(s):
 
 def jugador_manual_uttt(juego, s, j):
     pprint_uttt(s)
+    jugadas = juego.jugadas_legales(s, j)
+    print("Jugadas legales:", jugadas)
+
+    def movimiento_valido():
+        try:
+            movimiento = input("Que vas a jugar? (tablero (0-9), posicion(0-9)): ")
+            b, c = map(int, movimiento.strip().split(","))
+
+            if (b, c) in jugadas:
+                return (b, c)
+            else:
+                print(f"Movimiento ({b}, {c}) no es legal. Intenta de nuevo o seras arrestado.")
+                return movimiento_valido()
+        except ValueError:
+            print("Formato incorrecto. Usa: ")
+            return movimiento_valido()
+
+    return movimiento_valido()
 
 def jugare(juego):
     """
