@@ -104,6 +104,51 @@ def ordena_centro(jugadas, jugador):
     """
     return sorted(jugadas, key=lambda x: abs(x - 4))
 
+def ordena_extension(s, jugadas, jugador):
+    """
+    Ordena los movimientos basado en su potencial usando evalua_3con (Error)
+    """
+    juego = Conecta4()
+    puntajes = []
+
+    for movimiento in jugadas:
+        estado_nuevo = juego.transicion(s, movimiento, jugador)
+
+        if juego.ganancia(estado_nuevo) == jugador:
+            puntaje = float('inf')
+        else:
+            eval_estado = [1 if x == jugador else -1 if x != 0 else 0 for x in estado_nuevo]
+            puntaje = evalua_3con(eval_estado)
+
+            central = [3, 2, 4, 1, 5, 0, 6]
+            central_puntaje = 0.05 * (6 - central.index(movimiento))
+            puntaje += central_puntaje
+        
+        if jugador == 2:
+            puntaje = -puntaje
+        
+        puntajes.append((movimiento, puntaje))
+
+    puntajes_desc = [movimiento for movimiento, puntaje in sorted(puntajes, key=lambda x: x[1], reverse=True)]
+    return puntajes_desc
+
+def ordenar_jugadas_avanzado(jugadas, jugador):
+    """
+    Ordena jugadas con una estrategia un poco mas avanzada
+    """
+    # Preferencias de columna básicas
+    preferencia_columnas = {3: 10, 2: 8, 4: 8, 1: 6, 5: 6, 0: 4, 6: 4}
+    
+    if jugador == 1:
+        preferencia_columnas = {3: 12, 2: 9, 4: 9, 1: 6, 5: 6, 0: 3, 6: 3}
+    else:
+        preferencia_columnas = {3: 10, 2: 9, 4: 9, 1: 7, 5: 7, 0: 5, 6: 5}
+    
+    # Ordenar jugadas por preferencia de columna (mayor a menor)
+    jugadas_ordenadas = sorted(jugadas, key=lambda col: preferencia_columnas[col], reverse=True)
+    
+    return jugadas_ordenadas
+
 def evalua_3con(s):
     """
     Evalua el estado s para el jugador 1
@@ -146,7 +191,11 @@ def evalua_3con(s):
         print("ERROR, evaluación fuera de rango --> ", promedio)
     return promedio
 
-
+def evalua_nuevo(s):
+    """
+    Evalua actualmente nada
+    """
+    return 1
     
 if __name__ == '__main__':
 
@@ -170,14 +219,14 @@ if __name__ == '__main__':
             while type(d) != int or d < 1:
                 d = int(input("Profundidad: "))
             jugs.append(lambda juego, s, j: jugador_negamax(
-                juego, s, j, ordena=ordena_centro, evalua=evalua_3con, d=d)
+                juego, s, j, ordena=ordenar_jugadas_avanzado, evalua=evalua_3con, d=d)
             )
         else:
             t = None
             while type(t) != int or t < 1:
                 t = int(input("Tiempo: "))
             jugs.append(lambda juego, s, j: minimax_iterativo(
-                juego, s, j, ordena=ordena_centro, evalua=evalua_3con, tiempo=t)
+                juego, s, j, ordena=ordenar_jugadas_avanzado, evalua=evalua_3con, tiempo=t)
             )
         
     g, s_final = juega_dos_jugadores(modelo, jugs[0], jugs[1])

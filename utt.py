@@ -63,7 +63,7 @@ class UltimateTTT(ModeloJuegoZT2):
 
         nuevo_tablero[i] = j
 
-        sig_activo = b
+        sig_activo = i
 
         if self.victoria(nuevo_tableros[sig_activo]) != 0 or all(cell !=0 for cell in nuevo_tableros[sig_activo]):
             sig_activo = -1
@@ -166,27 +166,27 @@ def pprint_uttt(s):
     print(f"Tablero activo: {t if t != -1 else 'Cualquiera'}\n")
 
 def checar_victoria(tablero):
-        """
-        Funcion auxiliar para checar el tablero, regresa el jugador que lo gano o 0 si aun no hay
-        
-        """
-        if not isinstance(tablero, (list, tuple)) or len(tablero) != 9:
-            raise ValueError(f"Tablero 3x3, no {tablero}")
+    """
+    Funcion auxiliar para checar el tablero, regresa el jugador que lo gano o 0 si aun no hay
+    
+    """
+    if not isinstance(tablero, (list, tuple)) or len(tablero) != 9:
+        raise ValueError(f"Tablero 3x3, no {tablero}")
 
-        for i in range(3):
-            if tablero[3*i] != 0 and tablero[3*i] == tablero[3*i+1] == tablero[3*i+2]:
-                return tablero[3*i]
+    for i in range(3):
+        if tablero[3*i] != 0 and tablero[3*i] == tablero[3*i+1] == tablero[3*i+2]:
+            return tablero[3*i]
             
-        for i in range(3):
-            if tablero[i] != 0 and tablero[i] == tablero[i+3] == tablero[i+6]:
-                return tablero[i]
+    for i in range(3):
+        if tablero[i] != 0 and tablero[i] == tablero[i+3] == tablero[i+6]:
+            return tablero[i]
         
-        if tablero[0] != 0 and tablero[0] == tablero[4] == tablero[8]:
-            return tablero[0]
-        if tablero[2] != 0 and tablero[2] == tablero[4] == tablero[6]:
-            return tablero[2]
+    if tablero[0] != 0 and tablero[0] == tablero[4] == tablero[8]:
+        return tablero[0]
+    if tablero[2] != 0 and tablero[2] == tablero[4] == tablero[6]:
+        return tablero[2]
         
-        return 0
+    return 0
 
 def ordena_centro(jugadas, jugador):
     """
@@ -196,7 +196,7 @@ def ordena_centro(jugadas, jugador):
 
 def simple_evalua_uttt(s):
     """
-    Evalua el estado s para el jugador 1 de forma simple
+    Evalua el estado s para el jugador de forma simple
     """
     tableros, j, t = s
     opt = -j
@@ -210,6 +210,7 @@ def simple_evalua_uttt(s):
             [0, 4, 8], [2, 4, 6]              # diagonals
         ]
         for linea in lineas:
+            # Da valor a tener dos posiciones en un mini tablero
             valores = [tablero[i] for i in linea]
             if valores.count(j) == 2 and valores.count(0) == 1:
                 val += 1
@@ -217,7 +218,7 @@ def simple_evalua_uttt(s):
                 val -= 1
         return val
 
-    # Meta board result from checking mini boards
+    # Resultado del tablero grande checando los tableros mini
     meta_tab = [checar_victoria(b) for b in tableros]
 
     for tablero in tableros:
@@ -229,7 +230,7 @@ def simple_evalua_uttt(s):
         else:
             puntaje += eval_tab(tablero)
 
-        # Center control
+        # Center control - Valor a tener el centro en un minitablero
         if tablero[4] == j:
             puntaje += 0.5
         elif tablero[4] == opt:
@@ -241,7 +242,7 @@ def simple_evalua_uttt(s):
     elif meta_resultado == opt:
         puntaje -= 1000
 
-    # Center meta cell
+    # Center meta indice - Valor a tener el centro del meta tablero
     if meta_tab[4] == j:
         puntaje += 1
     elif meta_tab[4] == opt:
@@ -255,7 +256,7 @@ def jugador_manual_uttt(juego, s, j):
 
     def movimiento_valido():
         try:
-            movimiento = input("Que vas a jugar? (tablero (0-9), posicion(0-9)): ")
+            movimiento = input("Que vas a jugar? (ej. (4,4)): ")
             b, c = map(int, movimiento.strip().split(","))
 
             if (b, c) in jugadas:
@@ -264,7 +265,7 @@ def jugador_manual_uttt(juego, s, j):
                 print(f"Movimiento ({b}, {c}) no es legal. Intenta de nuevo o seras arrestado.")
                 return movimiento_valido()
         except ValueError:
-            print("Formato incorrecto. Usa: ")
+            print("Formato igual de invalido que Stephen Hawking. Formato Correcto: tablero, posicion (ejemplo: 4,2)")
             return movimiento_valido()
 
     return movimiento_valido()
