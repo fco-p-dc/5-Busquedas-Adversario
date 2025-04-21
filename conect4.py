@@ -193,9 +193,77 @@ def evalua_3con(s):
 
 def evalua_nuevo(s):
     """
-    Evalua actualmente nada
+    Evalua el estado s para el jugador 1, considerando secuencias de 3 y 2
     """
-    return 1
+    puntaje = 0
+    
+    # Secuencias de 3, vertical, horizontal y diagonal
+    for i in range(4): 
+        for j in range(7): 
+            indice = i * 7 + j
+            if s[indice] == s[indice + 7] == s[indice + 14] == 1:
+                puntaje += 5
+            elif s[indice] == s[indice + 7] == s[indice + 14] == -1:
+                puntaje -= 5
+
+    for i in range(6):
+        for j in range(4):
+            indice = i * 7 + j
+            if s[indice] == s[indice + 1] == s[indice + 2] == 1:
+                puntaje += 5
+            elif s[indice] == s[indice + 1] == s[indice + 2] == -1:
+                puntaje -= 5
+    
+    for i in range(3, 6):
+        for j in range(4):
+            indice = i * 7 + j
+            if s[indice] == s[indice - 6] == s[indice - 12] == 1:
+                puntaje += 5
+            elif s[indice] == s[indice - 6] == s[indice - 12] == -1:
+                puntaje -= 5
+
+    for i in range(4):
+        for j in range(5):
+            indice = i * 7 + j
+            if s[indice] == s[indice + 8] == s[indice + 16] == 1:
+                puntaje += 5
+            elif s[indice] == s[indice + 8] == s[indice + 16] == -1:
+                puntaje -= 5
+                
+    # Secuencias de 2, vertical, horizontal y diagonal
+    for i in range(5):  
+        for j in range(7):
+            indice = i * 7 + j
+            if s[indice] == s[indice + 7] == 1:
+                puntaje += 1
+            elif s[indice] == s[indice + 7] == -1:
+                puntaje -= 1
+
+    for i in range(6):  
+        for j in range(5):
+            indice = i * 7 + j
+            if s[indice] == s[indice + 1] == 1:
+                puntaje += 1
+            elif s[indice] == s[indice + 1] == -1:
+                puntaje -= 1
+    
+    for i in range(4,6):
+        for j in range(5):
+            indice = i * 7 + j
+            if s[indice] == s[indice - 6] == 1:
+                puntaje += 1
+            elif s[indice] == s[indice - 6] == -1:
+                puntaje -= 1
+
+    for i in range(4):
+        for j in range(5):
+            indice = i * 7 + j
+            if s[indice] == s[indice + 8] == 1:
+                puntaje += 1
+            elif s[indice] == s[indice + 8] == -1:
+                puntaje -= 1
+
+    return puntaje
     
 if __name__ == '__main__':
 
@@ -219,14 +287,14 @@ if __name__ == '__main__':
             while type(d) != int or d < 1:
                 d = int(input("Profundidad: "))
             jugs.append(lambda juego, s, j: jugador_negamax(
-                juego, s, j, ordena=ordenar_jugadas_avanzado, evalua=evalua_3con, d=d)
+                juego, s, j, ordena=ordenar_jugadas_avanzado, evalua=evalua_nuevo, d=d)
             )
         else:
             t = None
             while type(t) != int or t < 1:
                 t = int(input("Tiempo: "))
             jugs.append(lambda juego, s, j: minimax_iterativo(
-                juego, s, j, ordena=ordenar_jugadas_avanzado, evalua=evalua_3con, tiempo=t)
+                juego, s, j, ordena=ordenar_jugadas_avanzado, evalua=evalua_nuevo, tiempo=t)
             )
         
     g, s_final = juega_dos_jugadores(modelo, jugs[0], jugs[1])
